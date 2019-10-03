@@ -110,14 +110,19 @@ def start():
     # Create our session(link) from Python to the DB
     session = Session(engine)
     # calc_temps function
+    def calc_temps(start_date):
+        return session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
+        filter(Measurement.date >= start_date).all()
+
     def calc_temps(start_date, end_date):
         return session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
-        filter(Measurement.date >= start_date).filter(Measurement.date <= end_date).all()
+        filter(Measurement.date >= start_date).\
+        filter(Measurement.date <= end_date).all()
+    
     session.close()
 
-    calc_temps = list(np.ravel(calc_temps))
+    return(calc_temps)
 
-    return jsonify (calc_temps)
-
+    
 if __name__ == "__main__":
     app.run(debug=True)
