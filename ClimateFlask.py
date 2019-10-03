@@ -105,24 +105,37 @@ def tobs():
 
 
 @app.route("/api/v1.0/<start>")
-@app.route("/api/v1.0/<end>")
-def start():
+def start(start_date):
     # Create our session(link) from Python to the DB
     session = Session(engine)
     # calc_temps function
-    def calc_temps(start_date):
-        return session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
-        filter(Measurement.date >= start_date).all()
+    calc_temps = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
+            filter(Measurement.date >= start_date).all()
 
-    def calc_temps(start_date, end_date):
-        return session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
-        filter(Measurement.date >= start_date).\
-        filter(Measurement.date <= end_date).all()
-    
     session.close()
 
-    return(calc_temps)
+    start = list.append(np.ravel(calc_temps))
 
-    
+    return jsonify (start)
+
+
+
+@app.route("/api/v1.0/<start>/<end>")
+
+def start_end(start_date, end_date):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    calc_temps = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
+        filter(Measurement.date >= start_date).\
+        filter(Measurement.date <= end_date).all()
+
+    session.close()
+
+    start_end = list.append(np.ravel(calc_temps))
+
+    return jsonify (start_end)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
